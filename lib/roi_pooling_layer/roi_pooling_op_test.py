@@ -21,9 +21,9 @@ W = weight_variable([3, 3, 3, 1])
 h = conv2d(data, W)
 
 [y, argmax] = roi_pooling_op.roi_pool(h, rois, 6, 6, 1.0/3)
-pdb.set_trace()
+#pdb.set_trace()
 y_data = tf.convert_to_tensor(np.ones((2, 6, 6, 1)), dtype=tf.float32)
-print y_data, y, argmax
+print(y_data, y, argmax)
 
 # Minimize the mean squared errors.
 loss = tf.reduce_mean(tf.square(y - y_data))
@@ -33,10 +33,14 @@ train = optimizer.minimize(loss)
 init = tf.initialize_all_variables()
 
 # Launch the graph.
-sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
+import os
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID" # 按照PCI_BUS_ID顺序从0开始排列GPU设备
+os.environ["CUDA_VISIBLE_DEVICES"] = '1' #设置当前使用的GPU设备仅为0号设备
+gpu_options = tf.GPUOptions(allow_growth=True)
+sess = tf.Session(config=tf.ConfigProto(gpu_options=gpu_options))
 sess.run(init)
-pdb.set_trace()
-for step in xrange(10):
+#pdb.set_trace()
+for step in range(10):
     sess.run(train)
     print(step, sess.run(W))
     print(sess.run(y))

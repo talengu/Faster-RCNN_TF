@@ -1,5 +1,6 @@
 TF_INC=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_include())')
 TF_LIB=$(python -c 'import tensorflow as tf; print(tf.sysconfig.get_lib())')
+# ref issue https://github.com/tensorflow/tensorflow/issues/13607
 
 CUDA_PATH=/usr/local/cuda/
 CXXFLAGS=''

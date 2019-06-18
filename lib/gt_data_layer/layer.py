@@ -10,14 +10,15 @@
 GtDataLayer implements a Caffe Python layer.
 """
 
-import caffe
+# import caffe
 from fast_rcnn.config import cfg
 from gt_data_layer.minibatch import get_minibatch
 import numpy as np
 import yaml
 from multiprocessing import Process, Queue
 
-class GtDataLayer(caffe.Layer):
+# caffe.Layer
+class GtDataLayer():
     """Fast R-CNN data layer used for training."""
 
     def _shuffle_roidb_inds(self):
@@ -88,7 +89,7 @@ class GtDataLayer(caffe.Layer):
         num_scale = len(cfg.TRAIN.SCALES)
         num_aspect = len(cfg.TRAIN.ASPECTS)
         top[2].reshape(2 + 2*num_scale + 2*num_aspect)
-            
+
     def forward(self, bottom, top):
         """Get blobs and copy them into this layer's top blob vector."""
         blobs = self._get_next_minibatch()

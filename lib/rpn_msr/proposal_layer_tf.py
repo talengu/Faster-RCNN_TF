@@ -13,13 +13,15 @@ from fast_rcnn.bbox_transform import bbox_transform_inv, clip_boxes
 from fast_rcnn.nms_wrapper import nms
 import pdb
 
-
 DEBUG = False
 """
 Outputs object detection proposals by applying estimated bounding-box
 transformations to a set of regular boxes (called "anchors").
 """
-def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stride = [16,],anchor_scales = [8, 16, 32]):
+
+
+def proposal_layer(rpn_cls_prob_reshape, rpn_bbox_pred, im_info, cfg_key, _feat_stride=[16, ],
+                   anchor_scales=[8, 16, 32]):
     # Algorithm:
     #
     # for each (H, W) location i
@@ -32,39 +34,39 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stri
     # apply NMS with threshold 0.7 to remaining proposals
     # take after_nms_topN proposals after NMS
     # return the top proposals (-> RoIs top, scores top)
-    #layer_params = yaml.load(self.param_str_)
+    # layer_params = yaml.load(self.param_str_)
     _anchors = generate_anchors(scales=np.array(anchor_scales))
     _num_anchors = _anchors.shape[0]
-    rpn_cls_prob_reshape = np.transpose(rpn_cls_prob_reshape,[0,3,1,2])
-    rpn_bbox_pred = np.transpose(rpn_bbox_pred,[0,3,1,2])
-    #rpn_cls_prob_reshape = np.transpose(np.reshape(rpn_cls_prob_reshape,[1,rpn_cls_prob_reshape.shape[0],rpn_cls_prob_reshape.shape[1],rpn_cls_prob_reshape.shape[2]]),[0,3,2,1])
-    #rpn_bbox_pred = np.transpose(rpn_bbox_pred,[0,3,2,1])
+    rpn_cls_prob_reshape = np.transpose(rpn_cls_prob_reshape, [0, 3, 1, 2])
+    rpn_bbox_pred = np.transpose(rpn_bbox_pred, [0, 3, 1, 2])
+    # rpn_cls_prob_reshape = np.transpose(np.reshape(rpn_cls_prob_reshape,[1,rpn_cls_prob_reshape.shape[0],rpn_cls_prob_reshape.shape[1],rpn_cls_prob_reshape.shape[2]]),[0,3,2,1])
+    # rpn_bbox_pred = np.transpose(rpn_bbox_pred,[0,3,2,1])
     im_info = im_info[0]
 
     assert rpn_cls_prob_reshape.shape[0] == 1, \
         'Only single item batches are supported'
     # cfg_key = str(self.phase) # either 'TRAIN' or 'TEST'
-    #cfg_key = 'TEST'
-    pre_nms_topN  = cfg[cfg_key].RPN_PRE_NMS_TOP_N
+    # cfg_key = 'TEST'
+    pre_nms_topN = cfg[cfg_key].RPN_PRE_NMS_TOP_N
     post_nms_topN = cfg[cfg_key].RPN_POST_NMS_TOP_N
-    nms_thresh    = cfg[cfg_key].RPN_NMS_THRESH
-    min_size      = cfg[cfg_key].RPN_MIN_SIZE
+    nms_thresh = cfg[cfg_key].RPN_NMS_THRESH
+    min_size = cfg[cfg_key].RPN_MIN_SIZE
 
     # the first set of _num_anchors channels are bg probs
     # the second set are the fg probs, which we want
     scores = rpn_cls_prob_reshape[:, _num_anchors:, :, :]
     bbox_deltas = rpn_bbox_pred
-    #im_info = bottom[2].data[0, :]
+    # im_info = bottom[2].data[0, :]
 
     if DEBUG:
-        print 'im_size: ({}, {})'.format(im_info[0], im_info[1])
-        print 'scale: {}'.format(im_info[2])
+        print('im_size: ({}, {})'.format(im_info[0], im_info[1]))
+        print('scale: {}'.format(im_info[2]))
 
     # 1. Generate proposals from bbox deltas and shifted anchors
     height, width = scores.shape[-2:]
 
     if DEBUG:
-        print 'score map size: {}'.format(scores.shape)
+        print('score map size: {}'.format(scores.shape))
 
     # Enumerate all shifts
     shift_x = np.arange(0, width) * _feat_stride
@@ -135,13 +137,14 @@ def proposal_layer(rpn_cls_prob_reshape,rpn_bbox_pred,im_info,cfg_key,_feat_stri
     batch_inds = np.zeros((proposals.shape[0], 1), dtype=np.float32)
     blob = np.hstack((batch_inds, proposals.astype(np.float32, copy=False)))
     return blob
-    #top[0].reshape(*(blob.shape))
-    #top[0].data[...] = blob
+    # top[0].reshape(*(blob.shape))
+    # top[0].data[...] = blob
 
     # [Optional] output scores blob
-    #if len(top) > 1:
+    # if len(top) > 1:
     #    top[1].reshape(*(scores.shape))
     #    top[1].data[...] = scores
+
 
 def _filter_boxes(boxes, min_size):
     """Remove all boxes with any side smaller than min_size."""
