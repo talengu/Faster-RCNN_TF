@@ -19,7 +19,9 @@ For details about R-CNN please refer to the paper [Faster R-CNN: Towards Real-Ti
 1. Clone the Faster R-CNN repository
   ```Shell
   # Make sure to clone with --recursive
-  git clone --recursive https://github.com/smallcorgi/Faster-RCNN_TF.git
+  git clone --recursive https://github.com/talengu/Faster-RCNN_TF.git
+  cd Faster-RCNN_TF
+  git checkout py3_talen
   ```
 
 2. Build the Cython modules
